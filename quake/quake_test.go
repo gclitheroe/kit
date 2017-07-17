@@ -6,6 +6,46 @@ import (
 	"time"
 )
 
+func TestStatus(t *testing.T) {
+	testCases := []struct {
+		id     string
+		q      quake.Quake
+		status string
+	}{
+		{id: loc(), q: quake.Quake{}, status: "automatic"},
+		{id: loc(), q: quake.Quake{Type: "not existing"}, status: "deleted"},
+		{id: loc(), q: quake.Quake{Type: "duplicate"}, status: "duplicate"},
+		{id: loc(), q: quake.Quake{EvaluationMode: "manual"}, status: "reviewed"},
+		{id: loc(), q: quake.Quake{EvaluationStatus: "confirmed"}, status: "reviewed"},
+	}
+
+	for _, v := range testCases {
+		if v.status != v.q.Status() {
+			t.Errorf("%s expected status %s got %s", v.id, v.status, v.q.Status())
+		}
+	}
+}
+
+func TestQuality(t *testing.T) {
+	testCases := []struct {
+		id      string
+		q       quake.Quake
+		quality string
+	}{
+		{id: loc(), quality: "caution", q: quake.Quake{}},
+		{id: loc(), quality: "best", q: quake.Quake{EvaluationMode: "manual"}},
+		{id: loc(), quality: "deleted", q: quake.Quake{Type: "not existing"}},
+		{id: loc(), quality: "caution", q: quake.Quake{UsedPhaseCount: 19, MagnitudeStationCount: 9}},
+		{id: loc(), quality: "good", q: quake.Quake{UsedPhaseCount: 20, MagnitudeStationCount: 10}},
+		{id: loc(), quality: "deleted", q: quake.Quake{Type: "not existing", UsedPhaseCount: 20, MagnitudeStationCount: 10}},
+	}
+	for _, v := range testCases {
+		if v.quality != v.q.Quality() {
+			t.Errorf("%s expected quality %s got %s", v.id, v.quality, v.q.Quality())
+		}
+	}
+}
+
 func TestAlertQuality(t *testing.T) {
 	testCases := []struct {
 		id    string

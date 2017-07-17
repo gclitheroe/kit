@@ -2,6 +2,7 @@ package quake
 
 import "math"
 
+// TODO make these quake methods?
 // MMI calculates the maximum Modificed Mercalli Intensity.
 func MMI(depth, magnitude float64) float64 {
 	var w, m float64
@@ -26,6 +27,7 @@ func MMI(depth, magnitude float64) float64 {
 	return m
 }
 
+// TODO make these quake methods?
 // MMIDistance calculates the MMI at distance for New Zealand.  Distance and depth are in km.
 func MMIDistance(distance, depth, mmi float64) float64 {
 	// Minimum depth of 5 for numerical instability.
