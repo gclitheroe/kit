@@ -51,6 +51,6 @@ func TestMMIDistance(t *testing.T) {
 }
 
 func loc() string {
-	_, _, l, _ := runtime.Caller(2)
+	_, _, l, _ := runtime.Caller(1)
 	return "L" + strconv.Itoa(l)
 }
