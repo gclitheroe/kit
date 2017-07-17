@@ -50,6 +50,30 @@ func TestMMIDistance(t *testing.T) {
 	}
 }
 
+func TestIntensityMMI(t *testing.T) {
+	testCases := []struct {
+		id        string
+		intensity string
+		mmi       float64
+	}{
+		{id: loc(), intensity: "severe", mmi: 7},
+		{id: loc(), intensity: "strong", mmi: 6},
+		{id: loc(), intensity: "moderate", mmi: 5},
+		{id: loc(), intensity: "light", mmi: 4},
+		{id: loc(), intensity: "weak", mmi: 3},
+		{id: loc(), intensity: "unnoticeable", mmi: -9},
+	}
+
+	for _, v := range testCases {
+		if v.mmi != quake.IntensityMMI(v.intensity) {
+			t.Errorf("%s IntensityMMI expected %f got %f", v.id, v.mmi, quake.IntensityMMI(v.intensity))
+		}
+		if v.intensity != quake.MMIIntensity(v.mmi) {
+			t.Errorf("%s MMIIntensity expected %f got %f", v.id, v.mmi, quake.MMIIntensity(v.mmi))
+		}
+	}
+}
+
 func loc() string {
 	_, _, l, _ := runtime.Caller(1)
 	return "L" + strconv.Itoa(l)
