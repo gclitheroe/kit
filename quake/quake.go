@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+var alertAge = time.Duration(-60) * time.Minute
+
 // Quake for earthquakes.  Members (particularly strings) should follow SC3ML / QuakeML typing.
 type Quake struct {
 	PublicID              string
@@ -64,9 +66,9 @@ func (q *Quake) Quality() string {
 	}
 }
 
-// Returns true of the Quake is of high enough quality to consider for alerting.
-//  false if not.
-func (q *Quake) AlertQuality() (bool, string) {
+// Alert returns true if the quake should be considered for alerting, false
+// with a reason if not.
+func (q *Quake) Alert() (bool, string) {
 	switch {
 	case q.Status() == "deleted":
 		return false, fmt.Sprintf("%s status deleted not suitable for alerting.", q.PublicID)
@@ -76,6 +78,8 @@ func (q *Quake) AlertQuality() (bool, string) {
 		return false, fmt.Sprintf("%s unreviewed with %d phases and %d magnitudes not suitable for alerting.", q.PublicID, q.UsedPhaseCount, q.MagnitudeStationCount)
 	case q.Status() == "automatic" && !(q.Depth >= 0.1 && q.AzimuthalGap <= 320.0 && q.MinimumDistance <= 2.5):
 		return false, fmt.Sprintf("%s automatic with poor location criteria", q.PublicID)
+	case q.Time.Before(time.Now().UTC().Add(alertAge)):
+		return false, fmt.Sprintf("%s to old for alerting", q.PublicID)
 	default:
 		return true, ""
 	}

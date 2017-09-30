@@ -8,7 +8,7 @@ import (
 
 /*
 Versions of the input files are created by editing the source file and changing
-the version.  The validating them using the XSDs:
+the version.  Then validating them using the XSDs:
 
     xmllint --noout --schema sc3ml_0.7.xsd 2015p768477_0.7.xml
     xmllint --noout --schema sc3ml_0.8.xsd 2015p768477_0.8.xml
@@ -20,6 +20,7 @@ func TestUnmarshal(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
+		defer r.Close()
 
 		var s seiscomp
 
@@ -263,6 +264,8 @@ func TestDecodeSC3ML07CMT(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
+		defer r.Close()
+		defer r.Close()
 
 		var s seiscomp
 

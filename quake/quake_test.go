@@ -77,7 +77,7 @@ func TestQuality(t *testing.T) {
 	}
 }
 
-func TestAlertQuality(t *testing.T) {
+func TestAlert(t *testing.T) {
 	in := []struct {
 		id    string
 		q     Quake
@@ -135,10 +135,20 @@ func TestAlertQuality(t *testing.T) {
 	}
 
 	for _, v := range in {
-		alert, _ := v.q.AlertQuality()
+		alert, _ := v.q.Alert()
 
 		if alert != v.alert {
 			t.Errorf("%s incorrect alert quality got %t expected %t", v.id, alert, v.alert)
+		}
+	}
+
+	for _, v := range in {
+		v.q.Time = v.q.Time.Add(time.Minute * -61)
+
+		alert, _ := v.q.Alert()
+
+		if alert != false {
+			t.Errorf("%s expected false alert quality any old event", v.id)
 		}
 	}
 }

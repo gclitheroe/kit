@@ -10,13 +10,15 @@ import (
 )
 
 // types etc for unmarshaling SC3ML
-// these are private.  There is the kit/sc3ml pkg with public types.
 
-var sc3ml07 = []byte(`<seiscomp xmlns="http://geofon.gfz-potsdam.de/ns/seiscomp3-schema/0.7" version="0.7">`)
-var sc3ml08 = []byte(`<seiscomp xmlns="http://geofon.gfz-potsdam.de/ns/seiscomp3-schema/0.8" version="0.8">`)
-var sc3ml09 = []byte(`<seiscomp xmlns="http://geofon.gfz-potsdam.de/ns/seiscomp3-schema/0.9" version="0.9">`)
+const (
+	sc3ml07 = `http://geofon.gfz-potsdam.de/ns/seiscomp3-schema/0.7`
+	sc3ml08 = `http://geofon.gfz-potsdam.de/ns/seiscomp3-schema/0.8`
+	sc3ml09 = `http://geofon.gfz-potsdam.de/ns/seiscomp3-schema/0.9`
+)
 
 type seiscomp struct {
+	XMLns           string          `xml:"xmlns,attr"`
 	EventParameters eventParameters `xml:"EventParameters"`
 }
 
@@ -149,16 +151,16 @@ func unmarshal(r io.Reader, s *seiscomp) error {
 		return err
 	}
 
-	switch {
-	case bytes.Contains(b, sc3ml07):
-	case bytes.Contains(b, sc3ml08):
-	case bytes.Contains(b, sc3ml09):
-	default:
-		return errors.New("unsupported SC3ML version.")
-	}
-
 	if err := xml.Unmarshal(b, s); err != nil {
 		return err
+	}
+
+	switch s.XMLns {
+	case sc3ml07:
+	case sc3ml08:
+	case sc3ml09:
+	default:
+		return errors.New("unsupported SC3ML version")
 	}
 
 	var picks = make(map[string]pick)
@@ -231,6 +233,7 @@ func unmarshal(r io.Reader, s *seiscomp) error {
 	var by bytes.Buffer
 	by.Write(b)
 	d := xml.NewDecoder(&by)
+
 	var tk xml.Token
 
 	for {
