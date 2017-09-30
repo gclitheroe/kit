@@ -20,13 +20,13 @@ func TestUnmarshal(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer r.Close()
 
 		var s seiscomp
 
 		if err = unmarshal(r, &s); err != nil {
 			t.Errorf("%s: %s", input, err.Error())
 		}
+		r.Close()
 
 		if len(s.EventParameters.Events) != 1 {
 			t.Errorf("%s: should have found 1 event.", input)
@@ -264,14 +264,13 @@ func TestDecodeSC3ML07CMT(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer r.Close()
-		defer r.Close()
 
 		var s seiscomp
 
 		if err = unmarshal(r, &s); err != nil {
 			t.Errorf("%s: %s", input, err.Error())
 		}
+		r.Close()
 
 		if len(s.EventParameters.Events) != 1 {
 			t.Errorf("%s: should have found 1 event.", input)

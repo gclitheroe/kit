@@ -2,6 +2,7 @@ package quake
 
 import (
 	"fmt"
+	"io"
 	"time"
 )
 
@@ -99,4 +100,38 @@ func (q *Quake) Manual() bool {
 	default:
 		return false
 	}
+}
+
+func FromSC3ML(r io.Reader) (Quake, error) {
+	var s seiscomp
+
+	err := unmarshal(r, &s)
+	if err != nil {
+		return Quake{}, err
+	}
+
+	return Quake{
+		PublicID:              s.EventParameters.Events[0].PublicID,
+		Type:                  s.EventParameters.Events[0].Type,
+		AgencyID:              s.EventParameters.Events[0].CreationInfo.AgencyID,
+		MethodID:              s.EventParameters.Events[0].PreferredOrigin.MethodID,
+		EarthModelID:          s.EventParameters.Events[0].PreferredOrigin.EarthModelID,
+		EvaluationMode:        s.EventParameters.Events[0].PreferredOrigin.EvaluationMode,
+		EvaluationStatus:      s.EventParameters.Events[0].PreferredOrigin.EvaluationStatus,
+		DepthType:             s.EventParameters.Events[0].PreferredOrigin.DepthType,
+		MagnitudeType:         s.EventParameters.Events[0].PreferredMagnitude.Type,
+		Time:                  s.EventParameters.Events[0].PreferredOrigin.Time.Value,
+		Latitude:              s.EventParameters.Events[0].PreferredOrigin.Latitude.Value,
+		Longitude:             s.EventParameters.Events[0].PreferredOrigin.Longitude.Value,
+		Depth:                 s.EventParameters.Events[0].PreferredOrigin.Depth.Value,
+		StandardError:         s.EventParameters.Events[0].PreferredOrigin.Quality.StandardError,
+		AzimuthalGap:          s.EventParameters.Events[0].PreferredOrigin.Quality.AzimuthalGap,
+		MinimumDistance:       s.EventParameters.Events[0].PreferredOrigin.Quality.MinimumDistance,
+		UsedPhaseCount:        int(s.EventParameters.Events[0].PreferredOrigin.Quality.UsedPhaseCount),
+		UsedStationCount:      int(s.EventParameters.Events[0].PreferredOrigin.Quality.UsedStationCount),
+		MagnitudeStationCount: int(s.EventParameters.Events[0].PreferredMagnitude.StationCount),
+		Magnitude:             s.EventParameters.Events[0].PreferredMagnitude.Magnitude.Value,
+		MagnitudeUncertainty:  s.EventParameters.Events[0].PreferredMagnitude.Magnitude.Uncertainty,
+		ModificationTime:      s.EventParameters.Events[0].ModificationTime,
+	}, nil
 }

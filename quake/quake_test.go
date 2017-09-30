@@ -1,11 +1,95 @@
 package quake
 
 import (
+	"os"
 	"runtime"
 	"strconv"
 	"testing"
 	"time"
 )
+
+func TestFromSC3ML(t *testing.T) {
+	for _, input := range []string{"2015p768477_0.7.xml", "2015p768477_0.8.xml", "2015p768477_0.9.xml"} {
+		r, err := os.Open("testdata/" + input)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		e, err := FromSC3ML(r)
+		if err != nil {
+			t.Errorf("%s: %s", input, err.Error())
+		}
+		r.Close()
+
+		if e.PublicID != "2015p768477" {
+			t.Errorf("%s: expected publicID 2015p768477 got %s", input, e.PublicID)
+		}
+
+		if e.Type != "earthquake" {
+			t.Errorf("%s: expected type earthquake got %s", input, e.Type)
+		}
+
+		if e.Time.Format(time.RFC3339Nano) != "2015-10-12T08:05:01.717692Z" {
+			t.Errorf("%s: expected 2015-10-12T08:05:01.717692Z, got %s", input, e.Time.Format(time.RFC3339Nano))
+		}
+
+		if e.Latitude != -40.57806609 {
+			t.Errorf("%s: Latitude expected -40.57806609 got %f", input, e.Latitude)
+		}
+
+		if e.Longitude != 176.3257242 {
+			t.Errorf("%s: Longitude expected 176.3257242 got %f", input, e.Longitude)
+		}
+
+		if e.Depth != 23.28125 {
+			t.Errorf("%s: Depth expected 23.28125 got %f", input, e.Depth)
+		}
+
+		if e.MethodID != "NonLinLoc" {
+			t.Errorf("%s: MethodID expected NonLinLoc got %s", input, e.MethodID)
+		}
+
+		if e.EarthModelID != "nz3drx" {
+			t.Errorf("%s: EarthModelID expected NonLinLoc got %s", input, e.EarthModelID)
+		}
+
+		if e.StandardError != 0.5592857863 {
+			t.Errorf("%s: StandardError expected 0.5592857863 got %f", input, e.StandardError)
+		}
+
+		if e.AzimuthalGap != 166.4674465 {
+			t.Errorf("%s: AzimuthalGap expected 166.4674465 got %f", input, e.AzimuthalGap)
+		}
+
+		if e.MinimumDistance != 0.1217162272 {
+			t.Errorf("%s: MinimumDistance expected 0.1217162272 got %f", input, e.MinimumDistance)
+		}
+
+		if e.UsedPhaseCount != 44 {
+			t.Errorf("%s: UsedPhaseCount expected 44 got %d", input, e.UsedPhaseCount)
+		}
+
+		if e.UsedStationCount != 32 {
+			t.Errorf("%s: UsedStationCount expected 32 got %d", input, e.UsedStationCount)
+		}
+
+		if e.Magnitude != 5.691131913 {
+			t.Errorf("%s: Magnitude expected M got %s", input, e.Magnitude)
+		}
+
+		if e.MagnitudeUncertainty != 0 {
+			t.Errorf("%s: uncertainty expected 0 got %f", input, e.MagnitudeUncertainty)
+		}
+
+		if e.MagnitudeStationCount != 171 {
+			t.Errorf("%s: e.MagnitudeStationCount expected 171 got %d", input, e.MagnitudeStationCount)
+		}
+
+		if e.ModificationTime.Format(time.RFC3339Nano) != "2015-10-12T22:46:41.228824Z" {
+			t.Errorf("%s: Modification time expected 2015-10-12T22:46:41.228824Z got %s", input, e.ModificationTime.Format(time.RFC3339Nano))
+		}
+	}
+}
 
 func TestManual(t *testing.T) {
 	in := []struct {
